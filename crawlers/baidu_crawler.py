@@ -137,7 +137,7 @@ def getItemCoreMsg(html):
         for desc_div in desc_divs:
             desc_paras.append(desc_div.get_text().lstrip().rstrip())
 
-        # TODO: 根据infos[1]提取出文本中的链接
+        # TODO: 根据infos[1]提取出文本中的链接，需要进一步完善
         text_hrefs = selectNodeByAttr(str(infos[1][0]), 'a', encoding,
                                       {'target': '_blank'})
         for text_href in text_hrefs:
@@ -149,20 +149,15 @@ def getItemCoreMsg(html):
         # 提取条目附加信息
 
         for div in infos[2]:
-            #print(div)
-            #print('div -----')
-            # pairs = selectNodeByAttr(str(div), 'dl',
-            #                          encoding)  # 找出包含了条目附加信息的节点
+            # 键为dt节点，值为dd节点
             keys = selectNodeByAttr(str(div), 'dt', encoding)
             vals = selectNodeByAttr(str(div), 'dd', encoding)
-            # print(pairs)
             for key, val in zip(keys, vals):
-                # 键为dt节点，值为dd节点
+                # 清楚一些无效的Unicode字符，并进行简单的文字处理
                 key = unicodedata.normalize('NFKC', key.get_text())
                 val = unicodedata.normalize('NFKC',
                                             val.get_text().lstrip().rstrip())
-                pair_dict[key] = val
-            #print('pairs ------')
+                pair_dict[key] = val # 构造键值对
 
         if FUNC_DEBUG_OUTPUT['getItemCoreMsg']:
             print(title)
