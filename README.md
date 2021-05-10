@@ -1,5 +1,5 @@
-# KnowledgeGraph
-NLP midterm assignment
+# 知识图谱项目（Knowledge Graph）
+  自然语言处理（NLP）期中作业
 
-# 完成了寻医问药网的爬虫 2021.05.10
+## 完成了寻医问药网的爬虫 2021.05.10
   爬虫根据关键词爬取寻医问药网搜索结果的所有页面的所有条目
