@@ -35,6 +35,9 @@ FUNC_DEBUG_OUTPUT = {
     'main': True,
 }
 
+# class BaiduBaikeCrawler:
+#     def __init__(self):
+        
 
 def requestPageHTML(url, encoding='utf-8', save_path=None):
     # 必须传入一个非空URL
@@ -241,7 +244,7 @@ if __name__ == '__main__':
         'C++', 'Python', 'Java', 'Ruby', 'MATLAB', 'Swift', 'TensorFlow'
     ]
 
-    item_dicts = tvsKeywords(base_url, cs_keywords)  # 遍历每个关键字进行查询
+    item_dicts = tvsKeywords(base_url, cs_keywords)  # 遍历每个关键字进行查询，结果保存为一个字典的列表
 
     # 打开文件进行写入
     with open(FILE_DIR + 'item_dicts.json', 'w', encoding='utf-8') as fp:
