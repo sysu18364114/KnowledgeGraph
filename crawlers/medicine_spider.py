@@ -44,11 +44,12 @@ class XYWYMedicineSpider:
     def spider_main(self, pages=None, thread_id=1):
         err_pages = []
         for page in pages:
-            # try:
+            try:
                 page_url = r'http://yao.xywy.com/class/4-0-0-1-0-%s.htm' % page
 
                 page_items = self.medicine_spider(page_url)  # 传回当前页面药品信息列表
-                # 遍历列表逐行插入
+
+                # 遍历列表逐行插入药品数据
                 for item in page_items:
                     item['url'] = page_url
                     self.col_med.insert_one(item)
@@ -56,9 +57,9 @@ class XYWYMedicineSpider:
                 print('thread: %s | index: %s | url: %s' %
                       (thread_id, page, page_url))
 
-            # except Exception as e:
-            #     err_pages.append(page)
-            #     print(e, page)
+            except Exception as e:
+                err_pages.append(page)
+                print(e, page)
         return err_pages
 
     '''药品信息解析'''
@@ -114,10 +115,14 @@ class myThread(threading.Thread):  #继承父类threading.Thread
 
 if __name__ == '__main__':
     print('-- Main Started --')
+
+    # 多线程抓取数据
     thread1 = myThread(1, "Thread-1", XYWYMedicineSpider(), range(1, 120))
     thread2 = myThread(2, "Thread-2", XYWYMedicineSpider(), range(120, 240))
     thread3 = myThread(3, "Thread-3", XYWYMedicineSpider(), range(240, 366))
+
     thread1.start()
     thread2.start()
     thread3.start()
+
     print('-- Main Finished --')

@@ -52,7 +52,7 @@ class XYWYSpider:
     #         for i in selector.xpath('//h2[@class="item-title"]/a/@href')
     #     ]
     #     return urls
-    '''测试'''
+    '''抓取数据'''
 
     def spider_main(self, pages, thread_id=1):
         err_pages = []
@@ -246,12 +246,14 @@ class myThread(threading.Thread):  #继承父类threading.Thread
 if __name__ == '__main__':
 
     print('-- Main Started --')
-    
+
+    # 多线程抓取数据
     thread1 = myThread(1, "Thread-1", XYWYSpider(), range(1, 2000))
     thread2 = myThread(2, "Thread-2", XYWYSpider(), range(2000, 4000))
     thread3 = myThread(3, "Thread-3", XYWYSpider(), range(4000, 6000))
     thread4 = myThread(4, "Thread-4", XYWYSpider(), range(6000, 8000))
     thread5 = myThread(5, "Thread-5", XYWYSpider(), range(8000, 11000))
+    
     thread1.start()
     thread2.start()
     thread3.start()
