@@ -1,9 +1,12 @@
 ## 2021/05/10 ##
 
 import re
+import csv
 import time
 import json
 import random
+import pymysql
+import pymongo
 import requests
 import unicodedata
 
@@ -157,7 +160,7 @@ def getItemCoreMsg(html):
                 key = unicodedata.normalize('NFKC', key.get_text())
                 val = unicodedata.normalize('NFKC',
                                             val.get_text().lstrip().rstrip())
-                pair_dict[key] = val # 构造键值对
+                pair_dict[key] = val  # 构造键值对
 
         if FUNC_DEBUG_OUTPUT['getItemCoreMsg']:
             print(title)
@@ -167,34 +170,29 @@ def getItemCoreMsg(html):
     except IndexError as err:
         print('Exception: %s', err)
 
-    item_dict[title] = [desc_paras, pair_dict]
+    # 输出转化为字典形式
+    attr_name = ['keyword', 'description', 'appendix']
+    item_dict[attr_name[0]] = title
+    item_dict[attr_name[1]] = desc_paras
+    item_dict[attr_name[2]] = pair_dict
+    # item_dict[title] = [desc_paras, pair_dict]
     return item_dict
 
 
 def getItemCoreMsgUnitTest(baidu_url=None):
     # 必须传入一个非空URL
     if baidu_url == None:
-        print("'getItemCoreMsgUnitTest': URL doesn't be transmitted, check again!")
+        print(
+            "'getItemCoreMsgUnitTest': URL doesn't be transmitted, check again!"
+        )
         return
-        
+
     html = requestPageHTML(baidu_url, 'utf-8',
                            FILE_DIR + 'test_page_baidu.html')
     getItemCoreMsg(html)
 
 
-def crawl(baidu_url=None):
-    # 必须传入一个非空URL
-    if baidu_url == None:
-        print("'crawl': URL doesn't be transmitted, check again!")
-        return
-
-    # 第一次查询，获取种子页面的html
-    seed_html = requestPageHTML(
-        baidu_url, 'utf-8', FILE_DIR +
-        'test_page_baidu.html')  # 传入FILE_DIR + 'test_page.html'作第三个参数可以保存测试页面
-
-
-def tvsKeywords(base_url, keywords=None):
+def tvsKeywords(baidu_url, keywords=None):
     # 必须传入一个非空URL
     if baidu_url == None:
         print("'tvsKeywords': URL doesn't be transmitted, check again!")
@@ -208,20 +206,51 @@ def tvsKeywords(base_url, keywords=None):
         item_dicts.append(item_dict)  # 存储字典到列表中
     return item_dicts
 
+def openMongoDB(host='localhost', port=27017, db_name=None, col_name=None):
+    # 创建数据库连接
+    client = pymongo.MongoClient(host=host, port=port)
+
+    # 打开目标数据库
+    db_list = client.list_database_names()
+    if db_name in db_list:  # 判定目标数据库是否已经存在
+        print('Database %s exists already' % (db_name))
+    mydb = client[db_name]
+
+    # 打开目标集合
+    col_list = mydb.list_collection_names()
+    if col_name in col_list:  # 判定目标集合是否已经存在
+        print('Collection %s exists already' % (col_name))
+    mycol = mydb[col_name]
+
+    return (mydb, mycol)
+
 
 if __name__ == '__main__':
 
     print('Start main...')
 
+    # wikiRequest()
+
     base_url = r'https://baike.baidu.com/item/'
+
     disease_keywords = ['脑瘫', '脑卒中', '白血病', '肺癌', '胃癌', '口腔癌']
     medicine_keywords = [
         '洛伐他汀', '利多卡因', '普鲁卡因', '奥美拉唑', '克林霉素', '左氧氟沙星', '艾普拉唑', '西咪替丁'
     ]
-    item_dicts = tvsKeywords(base_url, medicine_keywords) # 遍历每个关键字进行查询
+    cs_keywords = [
+        'C++', 'Python', 'Java', 'Ruby', 'MATLAB', 'Swift', 'TensorFlow'
+    ]
+
+    item_dicts = tvsKeywords(base_url, cs_keywords)  # 遍历每个关键字进行查询
 
     # 打开文件进行写入
     with open(FILE_DIR + 'item_dicts.json', 'w', encoding='utf-8') as fp:
-        json_str = json.dumps(item_dicts, ensure_ascii=False)
+        # 输出写成json文件
+        json_str = json.dumps(item_dicts, ensure_ascii=False, indent=4)
         json_str.encode('utf-8')
         fp.write(json_str)
+
+        # 输出写入数据库
+        (mydb, mycol) = openMongoDB(db_name='baidu', col_name='sites')
+        insert_res = mycol.insert_many(item_dicts)
+        print(insert_res.inserted_ids)

@@ -58,10 +58,10 @@ def requestPageHTML(url, encoding='utf-8', save_path=None):
 
 
 def systemSleep(lhs=LOWER_BOUND, rhs=HIGHER_BOUND):
-    sleep_time = random.uniform(lhs, rhs) # 在上下限范围内随机选取休眠时间
+    sleep_time = random.uniform(lhs, rhs)  # 在上下限范围内随机选取休眠时间
     print('Sleep time: %.2lf | Sleeping...' % (sleep_time))
     print('------')
-    time.sleep(sleep_time) # 系统休眠
+    time.sleep(sleep_time)  # 系统休眠
 
 
 def selectNodeByAttr(html, node, encoding='utf-8', attrs=None):
@@ -76,10 +76,10 @@ def selectNodeByAttr(html, node, encoding='utf-8', attrs=None):
 
 def getDoctReply(html):
 
-    relpy_dict = {} # 医生回复的字典
+    relpy_dict = {}  # 医生回复的字典
     # 选取当前话题下所有医生的回复
-    doct_reply_divs = selectNodeByAttr(html, 'div', 'gbk',
-                                     {'class': 'docall clearfix'}) # doct: doctor
+    doct_reply_divs = selectNodeByAttr(
+        html, 'div', 'gbk', {'class': 'docall clearfix'})  # doct: doctor
     # 遍历每个回复
     for doct_reply_div in doct_reply_divs:
 
@@ -90,7 +90,7 @@ def getDoctReply(html):
 
         # 医生名字必定存在，但有一些普通医生可能姓名就是“医生”或“在职医师”
         doct_name = selectNodeByAttr(doct_reply_html, 'a', 'gbk',
-                                     {'class': 'f14 fb Doc_bla'})[0]  
+                                     {'class': 'f14 fb Doc_bla'})[0]
 
         # 医生回答必定存在
         doct_reply = selectNodeByAttr(
@@ -177,7 +177,7 @@ def getPageQuestion(html):
             else:
                 print('Pattern string "详情>>" is not exists')
         # 有一部分其他非“有问必答”的条目处理时会抛出AttributeError异常，略过即可
-        except AttributeError as err: 
+        except AttributeError as err:
             print('Error: %s' % err)
             continue
 
@@ -242,7 +242,8 @@ def crawl(xywy_url=None):
     question_dicts = []
 
     # 第一次查询，获取种子页面的html，后面将从这里面提取总页数
-    seed_html = requestPageHTML(xywy_url, 'utf-8') # 传入FILE_DIR + 'test_page.html'作第三个参数可以保存测试页面
+    seed_html = requestPageHTML(
+        xywy_url, 'utf-8')  # 传入FILE_DIR + 'test_page.html'作第三个参数可以保存测试页面
 
     # 获取当前话题下的总页数，并依次构造一组URL
     page_urls = getTopicPages(seed_html, xywy_url, 50)
@@ -270,16 +271,18 @@ def crawl(xywy_url=None):
             with open(FILE_DIR + 'question_dict_%d.json' % ii,
                       'w',
                       encoding='utf-8') as fp:
-                json_str = json.dumps(question_dicts, ensure_ascii=False)
+                json_str = json.dumps(question_dicts,
+                                      ensure_ascii=False,
+                                      indent=4)
                 json_str.encode('utf-8')
                 fp.write(json_str)
 
-        systemSleep(0.5, 1.0) # 每爬取一次，系统暂停一段时间，防止被封ip
+        systemSleep(0.5, 1.0)  # 每爬取一次，系统暂停一段时间，防止被封ip
 
     # 最后进行一次输出，保存最终结果
     with open(FILE_DIR + 'question_dict_last.json' % ii, 'w',
               encoding='utf-8') as fp:
-        json_str = json.dumps(question_dicts, ensure_ascii=False)
+        json_str = json.dumps(question_dicts, ensure_ascii=False, indent=4)
         json_str.encode('utf-8')
         fp.write(json_str)
 
