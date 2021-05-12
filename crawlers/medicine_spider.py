@@ -24,6 +24,8 @@ class XYWYMedicineSpider:
 
         self.col_med.delete_many({})
 
+        self.file_dir = 'E:/OneDrive/VSCode_Python/projects/20210509_NLP/missing_pages/'
+
     '''根据url，请求html'''
 
     def get_html(self, url):
@@ -34,7 +36,7 @@ class XYWYMedicineSpider:
         }
         req = urllib.request.Request(url=url, headers=headers)
         res = urllib.request.urlopen(req)
-        html = res.read().decode('gbk')
+        html = res.read().decode('utf-8')
         return html
 
     '''url解析'''
@@ -42,7 +44,7 @@ class XYWYMedicineSpider:
     def spider_main(self, pages=None, thread_id=1):
         err_pages = []
         for page in pages:
-            try:
+            # try:
                 page_url = r'http://yao.xywy.com/class/4-0-0-1-0-%s.htm' % page
 
                 page_items = self.medicine_spider(page_url)  # 传回当前页面药品信息列表
@@ -54,9 +56,9 @@ class XYWYMedicineSpider:
                 print('thread: %s | index: %s | url: %s' %
                       (thread_id, page, page_url))
 
-            except Exception as e:
-                err_pages.append(page)
-                print(e, page)
+            # except Exception as e:
+            #     err_pages.append(page)
+            #     print(e, page)
         return err_pages
 
     '''药品信息解析'''
@@ -68,7 +70,7 @@ class XYWYMedicineSpider:
             '//div[@class="h-drugs-item"]/div[@class="h-drugs-hd clearfix"]/a'
         )  # 药品名
         efficacys = selector.xpath(
-            '//div[@class="h-drugs-item"]/div[@class="h-drugs-hd clearfix"]/div[@class="fl h-drugs-txt ml20"]/div[@class="fl"]'
+            '//div[@class="h-drugs-item"]/div[@class="h-drugs-con clearfix"]/div[@class="fl h-drugs-txt ml20"]/div[@class="fl"]'
         )  # 药品功能简介
 
         # 打包药品信息
@@ -76,8 +78,8 @@ class XYWYMedicineSpider:
         for ind, (name, efficacy) in enumerate(zip(names, efficacys)):
             item = {}
             item['page_index'] = ind
-            item['name'] = name
-            item['efficacy'] = efficacy
+            item['name'] = name.text
+            item['efficacy'] = efficacy.text
             page_items.append(item)
 
         return page_items
@@ -102,9 +104,9 @@ class myThread(threading.Thread):  #继承父类threading.Thread
 
         with open(self.spider_handler.file_dir + 'medicine_err_pages.json',
                   'a',
-                  encoding='gbk') as fp:
+                  encoding='utf-8') as fp:
             json_str = json.dumps(err_pages, ensure_ascii=False, indent=4)
-            json_str.encode('gbk')
+            json_str.encode('utf-8')
             fp.write(json_str)
 
         print("Exiting", self.name)
