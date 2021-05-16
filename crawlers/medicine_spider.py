@@ -15,16 +15,14 @@ from lxml import etree
 class XYWYMedicineSpider:
     '''基于寻医问药网的医学数据采集'''
     def __init__(self):
+        # 一些预定义的变量
+        self.file_dir = 'E:/OneDrive/VSCode_Python/projects/20210509_NLP/missing_pages/'
+        
         # 初始化数据库
         self.conn = pymongo.MongoClient(host='localhost')
-
         self.db = self.conn['medical']
-
         self.col_med = self.db['medicine']
-
-        self.col_med.delete_many({})
-
-        self.file_dir = 'E:/OneDrive/VSCode_Python/projects/20210509_NLP/missing_pages/'
+        self.col_med.delete_many({}) # 插入之前先清除集合中所有内容，要视需要开启
 
     '''根据url，请求html'''
 

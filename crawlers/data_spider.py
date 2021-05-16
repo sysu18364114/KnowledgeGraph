@@ -20,8 +20,8 @@ class XYWYSpider:
 
         self.db = self.conn['medical']
 
-        self.col_data = self.db['data']
-        self.col_html = self.db['html']
+        self.col_data = self.db['disease']
+        # self.col_html = self.db['html']
         self.col_jc = self.db['jc']
 
         self.col_data.delete_many({})
@@ -29,6 +29,7 @@ class XYWYSpider:
         self.col_jc.delete_many({})
 
         self.file_dir = 'E:/OneDrive/VSCode_Python/projects/20210509_NLP/missing_pages/'
+        self.source='寻医问药网/疾病百科'
 
     '''根据url，请求html'''
 
@@ -68,6 +69,7 @@ class XYWYSpider:
                 drug_url = 'http://jib.xywy.com/il_sii/drug/%s.htm' % page
 
                 data = {}
+                data['source'] = self.source
                 data['url'] = basic_url
                 data['basic_info'] = self.basicinfo_spider(basic_url)
                 data['cause_info'] = self.common_spider(cause_url)
@@ -93,10 +95,10 @@ class XYWYSpider:
         html = self.get_html(url)
 
         # 保存url和html信息到数据库
-        data = {}
-        data['url'] = url
-        data['html'] = html
-        self.col_html.insert_one(data)
+        # data = {}
+        # data['url'] = url
+        # data['html'] = html
+        # self.col_html.insert_one(data)
 
         selector = etree.HTML(html)
         title = selector.xpath('//title/text()')[0]
