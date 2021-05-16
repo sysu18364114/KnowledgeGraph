@@ -244,10 +244,10 @@ if __name__ == '__main__':
         'C++', 'Python', 'Java', 'Ruby', 'MATLAB', 'Swift', 'TensorFlow'
     ]
 
-    item_dicts = tvsKeywords(base_url, cs_keywords)  # 遍历每个关键字进行查询，结果保存为一个字典的列表
+    item_dicts = tvsKeywords(base_url, disease_keywords)  # 遍历每个关键字进行查询，结果保存为一个字典的列表
 
     # 打开文件进行写入
-    with open(FILE_DIR + 'item_dicts.json', 'w', encoding='utf-8') as fp:
+    with open(FILE_DIR + 'baidu_item_dicts.json', 'w', encoding='utf-8') as fp:
         # 输出写成json文件
         json_str = json.dumps(item_dicts, ensure_ascii=False, indent=4)
         json_str.encode('utf-8')
